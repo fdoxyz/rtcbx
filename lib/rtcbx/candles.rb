@@ -1,7 +1,9 @@
 require 'rtcbx/candles/candle'
+require 'rtcbx/candles/candles_analysis.rb'
 
 class RTCBX
   class Candles < RTCBX
+    include CandlesAnalysis
 
     attr_reader :buckets
     attr_reader :history_queue
@@ -34,6 +36,12 @@ class RTCBX
 
       start_bucket_thread
       start_candle_thread
+    end
+
+    def load_history(history_candles)
+      @buckets_lock.synchronize do
+        @candles = (history_candles + @candles).sort_by(&:time)
+      end
     end
 
     private
